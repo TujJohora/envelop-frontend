@@ -1,7 +1,9 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import Button from "../components/Button";
+import ErrorMessage from "../components/ErrorMessage";
 import FormControl from "../components/FormControl";
 import SectionTitle from "../components/SectionTitle";
+import { useLogin } from "../hooks/useLogin";
 
 const Login = () => {
   const [formFields, setFormFeilds] = useState({
@@ -9,16 +11,12 @@ const Login = () => {
     password: "",
   });
 
-  const handleLogin = (e) => {
+ const { login, isLoading, error } = useLogin();
+
+   const handleLogin = async (e) => {
     e.preventDefault();
 
-    console.log(formFields);
-
-    // clear state
-    setFormFeilds({
-      email: "",
-      password: "",
-    });
+    await login(formFields.email, formFields.password);
   };
 
   return (
@@ -44,10 +42,12 @@ const Login = () => {
           setFormFeilds={setFormFeilds}
         />
 
-        <Button text="Login" submit />
+        <Button text={isLoading ? "Logging..." : "Login"} submit />
+
+        {error && <ErrorMessage error={error} />}
       </form>
     </div>
   );
 }
 
-export default Login
+export default React.memo(Login);
